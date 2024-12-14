@@ -28,6 +28,7 @@
   <ItemGroup>
     <ClInclude Include="Common\d3dApp.h" />
     <ClInclude Include="Common\d3dUtil.h" />
+    <ClInclude Include="Common\EnginePch.h" />
     <ClInclude Include="Common\GameTimer.h" />
     <ClInclude Include="Common\MathHelper.h" />
   </ItemGroup>

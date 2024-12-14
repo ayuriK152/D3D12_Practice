@@ -5,10 +5,6 @@
 #include "d3dApp.h"
 #include <WindowsX.h>
 
-using Microsoft::WRL::ComPtr;
-using namespace std;
-using namespace DirectX;
-
 LRESULT CALLBACK
 MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -376,7 +372,7 @@ bool D3DApp::InitMainWindow()
 {
 	WNDCLASS wc;
 	wc.style         = CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc   = MainWndProc; 
+	wc.lpfnWndProc   = MainWndProc;
 	wc.cbClsExtra    = 0;
 	wc.cbWndExtra    = 0;
 	wc.hInstance     = mhAppInst;
@@ -609,13 +605,13 @@ void D3DApp::LogAdapters()
 {
     UINT i = 0;
     IDXGIAdapter* adapter = nullptr;
-    std::vector<IDXGIAdapter*> adapterList;
+    vector<IDXGIAdapter*> adapterList;
     while(mdxgiFactory->EnumAdapters(i, &adapter) != DXGI_ERROR_NOT_FOUND)
     {
         DXGI_ADAPTER_DESC desc;
         adapter->GetDesc(&desc);
 
-        std::wstring text = L"***Adapter: ";
+        wstring text = L"***Adapter: ";
         text += desc.Description;
         text += L"\n";
 
@@ -642,7 +638,7 @@ void D3DApp::LogAdapterOutputs(IDXGIAdapter* adapter)
         DXGI_OUTPUT_DESC desc;
         output->GetDesc(&desc);
         
-        std::wstring text = L"***Output: ";
+        wstring text = L"***Output: ";
         text += desc.DeviceName;
         text += L"\n";
         OutputDebugString(text.c_str());
@@ -663,17 +659,17 @@ void D3DApp::LogOutputDisplayModes(IDXGIOutput* output, DXGI_FORMAT format)
     // Call with nullptr to get list count.
     output->GetDisplayModeList(format, flags, &count, nullptr);
 
-    std::vector<DXGI_MODE_DESC> modeList(count);
+    vector<DXGI_MODE_DESC> modeList(count);
     output->GetDisplayModeList(format, flags, &count, &modeList[0]);
 
     for(auto& x : modeList)
     {
         UINT n = x.RefreshRate.Numerator;
         UINT d = x.RefreshRate.Denominator;
-        std::wstring text =
-            L"Width = " + std::to_wstring(x.Width) + L" " +
-            L"Height = " + std::to_wstring(x.Height) + L" " +
-            L"Refresh = " + std::to_wstring(n) + L"/" + std::to_wstring(d) +
+        wstring text =
+            L"Width = " + to_wstring(x.Width) + L" " +
+            L"Height = " + to_wstring(x.Height) + L" " +
+            L"Refresh = " + to_wstring(n) + L"/" + to_wstring(d) +
             L"\n";
 
         ::OutputDebugString(text.c_str());

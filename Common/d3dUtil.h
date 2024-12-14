@@ -6,28 +6,7 @@
 
 #pragma once
 
-#include <windows.h>
-#include <wrl.h>
-#include <dxgi1_4.h>
-#include <d3d12.h>
-#include <D3Dcompiler.h>
-#include <DirectXMath.h>
-#include <DirectXPackedVector.h>
-#include <DirectXColors.h>
-#include <DirectXCollision.h>
-#include <string>
-#include <memory>
-#include <algorithm>
-#include <vector>
-#include <array>
-#include <unordered_map>
-#include <cstdint>
-#include <fstream>
-#include <sstream>
-#include <cassert>
-#include "d3dx12.h"
-#include "DDSTextureLoader.h"
-#include "MathHelper.h"
+#include "EnginePch.h"
 
 extern const int gNumFrameResources;
 
@@ -53,11 +32,11 @@ inline void d3dSetDebugName(ID3D12DeviceChild* obj, const char* name)
     }
 }
 
-inline std::wstring AnsiToWString(const std::string& str)
+inline wstring AnsiToWString(const string& str)
 {
     WCHAR buffer[512];
     MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, buffer, 512);
-    return std::wstring(buffer);
+    return wstring(buffer);
 }
 
 /*
@@ -94,7 +73,7 @@ public:
 
     static bool IsKeyDown(int vkeyCode);
 
-    static std::string ToString(HRESULT hr);
+    static string ToString(HRESULT hr);
 
     static UINT CalcConstantBufferByteSize(UINT byteSize)
     {
@@ -112,33 +91,33 @@ public:
         return (byteSize + 255) & ~255;
     }
 
-    static Microsoft::WRL::ComPtr<ID3DBlob> LoadBinary(const std::wstring& filename);
+    static ComPtr<ID3DBlob> LoadBinary(const wstring& filename);
 
-    static Microsoft::WRL::ComPtr<ID3D12Resource> CreateDefaultBuffer(
+    static ComPtr<ID3D12Resource> CreateDefaultBuffer(
         ID3D12Device* device,
         ID3D12GraphicsCommandList* cmdList,
         const void* initData,
         UINT64 byteSize,
-        Microsoft::WRL::ComPtr<ID3D12Resource>& uploadBuffer);
+        ComPtr<ID3D12Resource>& uploadBuffer);
 
-	static Microsoft::WRL::ComPtr<ID3DBlob> CompileShader(
-		const std::wstring& filename,
+	static ComPtr<ID3DBlob> CompileShader(
+		const wstring& filename,
 		const D3D_SHADER_MACRO* defines,
-		const std::string& entrypoint,
-		const std::string& target);
+		const string& entrypoint,
+		const string& target);
 };
 
 class DxException
 {
 public:
     DxException() = default;
-    DxException(HRESULT hr, const std::wstring& functionName, const std::wstring& filename, int lineNumber);
+    DxException(HRESULT hr, const wstring& functionName, const wstring& filename, int lineNumber);
 
-    std::wstring ToString()const;
+    wstring ToString()const;
 
     HRESULT ErrorCode = S_OK;
-    std::wstring FunctionName;
-    std::wstring Filename;
+    wstring FunctionName;
+    wstring Filename;
     int LineNumber = -1;
 };
 
@@ -154,24 +133,24 @@ struct SubmeshGeometry
 
     // Bounding box of the geometry defined by this submesh. 
     // This is used in later chapters of the book.
-	DirectX::BoundingBox Bounds;
+	BoundingBox Bounds;
 };
 
 struct MeshGeometry
 {
 	// Give it a name so we can look it up by name.
-	std::string Name;
+	string Name;
 
 	// System memory copies.  Use Blobs because the vertex/index format can be generic.
 	// It is up to the client to cast appropriately.  
-	Microsoft::WRL::ComPtr<ID3DBlob> VertexBufferCPU = nullptr;
-	Microsoft::WRL::ComPtr<ID3DBlob> IndexBufferCPU  = nullptr;
+	ComPtr<ID3DBlob> VertexBufferCPU = nullptr;
+	ComPtr<ID3DBlob> IndexBufferCPU  = nullptr;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> VertexBufferGPU = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> IndexBufferGPU = nullptr;
+	ComPtr<ID3D12Resource> VertexBufferGPU = nullptr;
+	ComPtr<ID3D12Resource> IndexBufferGPU = nullptr;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> VertexBufferUploader = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> IndexBufferUploader = nullptr;
+	ComPtr<ID3D12Resource> VertexBufferUploader = nullptr;
+	ComPtr<ID3D12Resource> IndexBufferUploader = nullptr;
 
     // Data about the buffers.
 	UINT VertexByteStride = 0;
@@ -182,7 +161,7 @@ struct MeshGeometry
 	// A MeshGeometry may store multiple geometries in one vertex/index buffer.
 	// Use this container to define the Submesh geometries so we can draw
 	// the Submeshes individually.
-	std::unordered_map<std::string, SubmeshGeometry> DrawArgs;
+	unordered_map<string, SubmeshGeometry> DrawArgs;
 
 	D3D12_VERTEX_BUFFER_VIEW VertexBufferView()const
 	{
@@ -214,11 +193,11 @@ struct MeshGeometry
 
 struct Light
 {
-    DirectX::XMFLOAT3 Strength = { 0.5f, 0.5f, 0.5f };
+    XMFLOAT3 Strength = { 0.5f, 0.5f, 0.5f };
     float FalloffStart = 1.0f;                          // point/spot light only
-    DirectX::XMFLOAT3 Direction = { 0.0f, -1.0f, 0.0f };// directional/spot light only
+    XMFLOAT3 Direction = { 0.0f, -1.0f, 0.0f };// directional/spot light only
     float FalloffEnd = 10.0f;                           // point/spot light only
-    DirectX::XMFLOAT3 Position = { 0.0f, 0.0f, 0.0f };  // point/spot light only
+    XMFLOAT3 Position = { 0.0f, 0.0f, 0.0f };  // point/spot light only
     float SpotPower = 64.0f;                            // spot light only
 };
 
@@ -226,12 +205,12 @@ struct Light
 
 struct MaterialConstants
 {
-	DirectX::XMFLOAT4 DiffuseAlbedo = { 1.0f, 1.0f, 1.0f, 1.0f };
-	DirectX::XMFLOAT3 FresnelR0 = { 0.01f, 0.01f, 0.01f };
+	XMFLOAT4 DiffuseAlbedo = { 1.0f, 1.0f, 1.0f, 1.0f };
+	XMFLOAT3 FresnelR0 = { 0.01f, 0.01f, 0.01f };
 	float Roughness = 0.25f;
 
 	// Used in texture mapping.
-	DirectX::XMFLOAT4X4 MatTransform = MathHelper::Identity4x4();
+	XMFLOAT4X4 MatTransform = MathHelper::Identity4x4();
 };
 
 // Simple struct to represent a material for our demos.  A production 3D engine
@@ -257,28 +236,28 @@ struct Material
 	int NumFramesDirty = gNumFrameResources;
 
 	// Material constant buffer data used for shading.
-	DirectX::XMFLOAT4 DiffuseAlbedo = { 1.0f, 1.0f, 1.0f, 1.0f };
-	DirectX::XMFLOAT3 FresnelR0 = { 0.01f, 0.01f, 0.01f };
+	XMFLOAT4 DiffuseAlbedo = { 1.0f, 1.0f, 1.0f, 1.0f };
+	XMFLOAT3 FresnelR0 = { 0.01f, 0.01f, 0.01f };
 	float Roughness = .25f;
-	DirectX::XMFLOAT4X4 MatTransform = MathHelper::Identity4x4();
+	XMFLOAT4X4 MatTransform = MathHelper::Identity4x4();
 };
 
 struct Texture
 {
 	// Unique material name for lookup.
-	std::string Name;
+	string Name;
 
-	std::wstring Filename;
+	wstring Filename;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> Resource = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12Resource> UploadHeap = nullptr;
+	ComPtr<ID3D12Resource> Resource = nullptr;
+	ComPtr<ID3D12Resource> UploadHeap = nullptr;
 };
 
 #ifndef ThrowIfFailed
 #define ThrowIfFailed(x)                                              \
 {                                                                     \
     HRESULT hr__ = (x);                                               \
-    std::wstring wfn = AnsiToWString(__FILE__);                       \
+    wstring wfn = AnsiToWString(__FILE__);                       \
     if(FAILED(hr__)) { throw DxException(hr__, L#x, wfn, __LINE__); } \
 }
 #endif
